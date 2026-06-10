@@ -1,0 +1,38 @@
+# Render blueprint — forces a Node web service (Render was auto-detecting Python).
+# Deploy via Render dashboard → New + → Blueprint → pick this repo.
+#
+# NOTE on region: Render has no India region; "singapore" is the closest. Fine for
+# a TEST number. For production move to an India region (Vercel bom1 / AWS Mumbai)
+# for DPDP data residency — the same code/Docker image runs there unchanged.
+services:
+  - type: web
+    name: ai-clinic-wa-bot
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: WHATSAPP_PROVIDER
+        value: twofactor
+      - key: TWOFACTOR_BASE_URL
+        value: https://api.2factor.in
+      # Secrets — set these in the Render dashboard (sync:false = not stored in git):
+      - key: WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: TWOFACTOR_API_KEY
+        sync: false
+      - key: WHATSAPP_BUSINESS_NUMBER
+        sync: false
+      - key: STORAGE_BUCKET
+        sync: false
+      - key: STORAGE_REGION
+        sync: false
+      - key: STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: STORAGE_SECRET_ACCESS_KEY
+        sync: false
