@@ -16,6 +16,11 @@ const schema = z.object({
   TWOFACTOR_API_KEY: z.string().optional(),
   TWOFACTOR_BASE_URL: z.string().default('https://api.2factor.in'),
 
+  // Meta WhatsApp Cloud API (used when WHATSAPP_PROVIDER=meta)
+  META_ACCESS_TOKEN: z.string().optional(),
+  META_PHONE_NUMBER_ID: z.string().optional(),
+  META_API_VERSION: z.string().default('v21.0'),
+
   STORAGE_BUCKET: z.string().optional(),
   STORAGE_REGION: z.string().default('ap-south-1'),
   STORAGE_ENDPOINT: z.string().optional(),
