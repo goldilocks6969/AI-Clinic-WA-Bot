@@ -16,12 +16,23 @@ export async function webhookRoutes(app: FastifyInstance): Promise<void> {
 
   // Inbound messages.
   app.post('/api/webhook', async (req, reply) => {
-    const messages = provider.parseInbound(req.body);
+    // DIAGNOSTIC: log the raw payload so we can confirm 2Factor's real shape.
+    req.log.info({ rawBody: req.body }, 'INBOUND_WEBHOOK_RAW');
+
+    let messages;
+    try {
+      messages = provider.parseInbound(req.body);
+    } catch (err) {
+      req.log.error({ err }, 'parseInbound failed');
+      return reply.code(200).send({ received: 0, parseError: true });
+    }
+    req.log.info({ count: messages.length, from: messages.map((m) => m.from) }, 'INBOUND_PARSED');
+
     for (const message of messages) {
       try {
         await dispatch(message);
       } catch (err) {
-        req.log.error({ err, from: message.from }, 'dispatch failed');
+        req.log.error({ err: String(err), from: message.from }, 'DISPATCH_FAILED');
       }
     }
     return reply.code(200).send({ received: messages.length });
